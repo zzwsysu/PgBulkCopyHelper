@@ -4,10 +4,6 @@ PgBulkCopyHelper 是一个包装了 Npgsql 中 [Binary COPY][1] 方法的类库�
 
 PS：这是 PostgreSQL 中用来大批量导入数据的 [COPY][3] 方法的说明
 
-[1]: http://www.npgsql.org/doc/copy.html
-[2]: https://www.postgresql.org/
-[3]: https://www.postgresql.org/docs/current/static/sql-copy.html
-
 # 开发环境及依赖
 
 * 开发环境为 VS2015
@@ -50,7 +46,7 @@ PS：这是 PostgreSQL 中用来大批量导入数据的 [COPY][3] 方法的说�
 	    }
 	```
 
-3. 根据定义的模型生成一个 PgBulkCopyHelper 实例：
+3. 根据定义的模型生成一个 PgBulkCopyHelper 实例（[数据类型映射][4]）：
 
 	```csharp
 	//函数原型：
@@ -122,5 +118,12 @@ PS：这是 PostgreSQL 中用来大批量导入数据的 [COPY][3] 方法的说�
 	            dataTable.Clear();
 	        }
 	    }
+        //记得要把最后一次的数据插入
+        copyHelper.BulkInsert(conn, dataTable);
 	}
 	```
+
+[1]: http://www.npgsql.org/doc/copy.html
+[2]: https://www.postgresql.org/
+[3]: https://www.postgresql.org/docs/current/static/sql-copy.html
+[4]: http://www.npgsql.org/doc/types.html
