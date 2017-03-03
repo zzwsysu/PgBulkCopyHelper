@@ -27,6 +27,11 @@ namespace PgBulkCopyHelper
         /// 数据表全名：schema.tableName or tableName
         /// </summary>
         public string FullTableName { get; }
+        /// <summary>
+        /// 格式化后的postgresql表字段字符串
+        /// 形式为：col1, col2, ...
+        /// </summary>
+        public string ColNamesFormated { get; }
 
         /// <summary>
         /// 构造函数
@@ -43,6 +48,7 @@ namespace PgBulkCopyHelper
                 PropNames.Add(tParam.Name);
                 PropInfo[tParam.Name] = tParam.PropertyType;
             }
+            ColNamesFormated = string.Join(", ", PropNames);
 
             if (!string.IsNullOrWhiteSpace(tableName))
             {
@@ -133,13 +139,26 @@ namespace PgBulkCopyHelper
         /// </summary>
         /// <param name="conn">PostgreSQL连接</param>
         /// <param name="dataTable">数据表</param>
-        public void BulkInsert(NpgsqlConnection conn, DataTable dataTable)
+        /// <param name="isOvercover">指示dataTable的列是否完全覆盖数据库中表的字段</param>
+        public void BulkInsert(NpgsqlConnection conn, DataTable dataTable, bool isOvercover = true)
         {
-            var commandFormat = string.Format(CultureInfo.InvariantCulture, "COPY {0} FROM STDIN BINARY", FullTableName);
-            using (var writer = conn.BeginBinaryImport(commandFormat))
+            if(isOvercover)
             {
-                foreach (DataRow item in dataTable.Rows)
-                    writer.WriteRow(item.ItemArray);
+                var commandFormat = string.Format(CultureInfo.InvariantCulture, "COPY {0} FROM STDIN (FORMAT BINARY)", FullTableName);
+                using (var writer = conn.BeginBinaryImport(commandFormat))
+                {
+                    foreach (DataRow item in dataTable.Rows)
+                        writer.WriteRow(item.ItemArray);
+                }
+            }
+            else
+            {
+                var commandFormat = string.Format(CultureInfo.InvariantCulture, "COPY {0} ({1}) FROM STDIN (FORMAT BINARY)", FullTableName, ColNamesFormated);
+                using (var writer = conn.BeginBinaryImport(commandFormat))
+                {
+                    foreach (DataRow item in dataTable.Rows)
+                        writer.WriteRow(item.ItemArray);
+                }
             }
         }
     }
