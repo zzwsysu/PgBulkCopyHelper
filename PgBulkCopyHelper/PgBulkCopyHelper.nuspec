@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>PgBulkCopyHelper</id>
-    <version>1.1.0</version>
+    <version>2.0.0</version>
     <title>The package wraps the COPY commad of postgresql for allowing efficient bulk import</title>
     <authors>Zhiwei Zhang</authors>
     <owners>Zhiwei Zhang</owners>
@@ -12,9 +12,13 @@
     PgBulkCopyHelper 是一个包装了 Npgsql 中 Binary COPY 方法的类库，用来高效率地把大量数据插入到 PostgreSQL 数据库当中
     </description>
     <releaseNotes>
-    * 新功能：增加isOvercover参数指示模板类的属性是否完全覆盖数据库中表的字段，默认为true
+    * 新功能：当数据模型中的属性并不能完全覆盖数据表中的字段时，让然能够正常工作
+    * 更改：删除 Test_Proj
     </releaseNotes>
     <copyright>Copyright 2017</copyright>
     <tags>postgresql COPY Bulk</tags>
+    <dependencies>
+      <dependency id="Npgsql" version="3.1.8" />
+    </dependencies>
   </metadata>
 </package>
