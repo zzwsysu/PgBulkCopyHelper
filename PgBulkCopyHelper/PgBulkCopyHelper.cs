@@ -139,26 +139,13 @@ namespace PgBulkCopyHelper
         /// </summary>
         /// <param name="conn">PostgreSQL连接</param>
         /// <param name="dataTable">数据表</param>
-        /// <param name="isOvercover">指示dataTable的列是否完全覆盖数据库中表的字段</param>
-        public void BulkInsert(NpgsqlConnection conn, DataTable dataTable, bool isOvercover = true)
+        public void BulkInsert(NpgsqlConnection conn, DataTable dataTable)
         {
-            if(isOvercover)
+            var commandFormat = string.Format(CultureInfo.InvariantCulture, "COPY {0} ({1}) FROM STDIN (FORMAT BINARY)", FullTableName, ColNamesFormated);
+            using (var writer = conn.BeginBinaryImport(commandFormat))
             {
-                var commandFormat = string.Format(CultureInfo.InvariantCulture, "COPY {0} FROM STDIN (FORMAT BINARY)", FullTableName);
-                using (var writer = conn.BeginBinaryImport(commandFormat))
-                {
-                    foreach (DataRow item in dataTable.Rows)
-                        writer.WriteRow(item.ItemArray);
-                }
-            }
-            else
-            {
-                var commandFormat = string.Format(CultureInfo.InvariantCulture, "COPY {0} ({1}) FROM STDIN (FORMAT BINARY)", FullTableName, ColNamesFormated);
-                using (var writer = conn.BeginBinaryImport(commandFormat))
-                {
-                    foreach (DataRow item in dataTable.Rows)
-                        writer.WriteRow(item.ItemArray);
-                }
+                foreach (DataRow item in dataTable.Rows)
+                    writer.WriteRow(item.ItemArray);
             }
         }
     }
